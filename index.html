@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuración y Soporte a Redes - CTP Santa Bárbara</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            user-select: none;
+        }
+
+        body {
+            background-color: #E2E8F0;
+            color: #1E293B;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* MODAL DE REGISTRO PREVIO */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(8px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-card {
+            background: #FFFFFF;
+            border-radius: 16px;
+            padding: 32px;
+            width: 90%;
+            max-width: 480px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            text-align: center;
+        }
+
+        .modal-card h2 {
+            color: #0F172A;
+            margin-bottom: 8px;
+            font-size: 1.5rem;
+        }
+
+        .modal-card p {
+            color: #64748B;
+            font-size: 0.95rem;
+            margin-bottom: 24px;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 6px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #CBD5E1;
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .input-group input:focus {
+            border-color: #3B82F6;
+        }
+
+        .btn-start {
+            width: 100%;
+            background-color: #2563EB;
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            margin-top: 8px;
+        }
+
+        .btn-start:hover {
+            background-color: #1D4ED8;
+        }
+
+        .btn-start:active {
+            transform: scale(0.98);
+        }
+
+        /* ENCABEZADO FIJO */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 70px;
+            background-color: #1E293B;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 24px;
+            z-index: 100;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-title h1 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .header-title span {
+            font-size: 0.8rem;
+            color: #94A3B8;
+            font-weight: 400;
+        }
+
+        .header-badges {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .badge {
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .badge-phase {
+            background-color: #F59E0B;
+            color: #FFFFFF;
+        }
+
+        .badge-timer {
+            background-color: rgba(255, 255, 255, 0.15);
+            color: #FFFFFF;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .badge-progress {
+            background-color: rgba(255, 255, 255, 0.15);
+            color: #FFFFFF;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* LAYOUT PRINCIPAL */
+        main {
+            margin-top: 80px;
+            margin-bottom: 70px;
+            padding: 24px;
+            max-width: 1300px;
+            width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 24px;
+            align-items: start;
+        }
+
+        /* COLUMNA IZQUIERDA - PREGUNTAS */
+        .questions-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .question-card {
+            background: #FFFFFF;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border: 1px solid #E2E8F0;
+            transition: all 0.2s ease;
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #64748B;
+        }
+
+        .question-text {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: #1E293B;
+        }
+
+        /* DROP ZONE */
+        .drop-zone {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 140px;
+            height: 38px;
+            border: 2px dashed #CBD5E1;
+            background-color: #F8FAFC;
+            border-radius: 8px;
+            margin: 0 6px;
+            vertical-align: middle;
+            padding: 0 10px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .drop-zone.hovered {
+            background-color: #E0F2FE;
+            border-color: #0284C7;
+        }
+
+        .drop-zone.filled {
+            border-style: solid;
+            border-color: transparent;
+        }
+
+        /* COLUMNA DERECHA - BANCO DE RESPUESTAS */
+        .sidebar-container {
+            position: sticky;
+            top: 94px;
+        }
+
+        .bank-card {
+            background: #FFFFFF;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            border: 1px solid #E2E8F0;
+        }
+
+        .bank-title {
+            font-size: 0.95rem;
+            font-weight: 800;
+            text-align: center;
+            color: #334155;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .draggable-btn {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 700;
+            font-size: 0.95rem;
+            text-align: center;
+            cursor: grab;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.15s, box-shadow 0.15s, border 0.15s;
+            border: 3px solid transparent;
+            word-break: break-word;
+        }
+
+        .draggable-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+        }
+
+        .draggable-btn.selected-option {
+            border-color: #FACC15 !important;
+            box-shadow: 0 0 12px rgba(250, 204, 21, 0.6);
+            transform: scale(1.02);
+        }
+
+        .draggable-btn.used {
+            opacity: 0.3;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        /* COLORES BOTONES */
+        .color-0 { background-color: #1D80E2; }
+        .color-1 { background-color: #E13B3B; }
+        .color-2 { background-color: #FF9800; }
+        .color-3 { background-color: #2E7D32; }
+        .color-4 { background-color: #9C27B0; }
+        .color-5 { background-color: #0D47A1; }
+
+        /* FEEDBACK BOX */
+        .feedback-box {
+            margin-top: 14px;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            display: none;
+        }
+
+        .feedback-box.correct {
+            display: block;
+            background-color: #DCFCE7;
+            border: 1px solid #86EFAC;
+            color: #166534;
+        }
+
+        .feedback-box.incorrect {
+            display: block;
+            background-color: #FEE2E2;
+            border: 1px solid #FCA5A5;
+            color: #991B1B;
+        }
+
+        /* NAVEGACIÓN Y BARRA INFERIOR */
+        .nav-controls {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
+        }
+
+        .btn-nav {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+        }
+
+        .btn-secondary {
+            background-color: #64748B;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #475569;
+        }
+
+        .btn-primary {
+            background-color: #16A34A;
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(22, 163, 74, 0.3);
+        }
+
+        .btn-primary:hover {
+            background-color: #15803D;
+        }
+
+        footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background-color: #1E293B;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            z-index: 100;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .footer-btn {
+            background: transparent;
+            border: none;
+            color: #94A3B8;
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .footer-btn:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            main {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar-container {
+                position: static;
+                order: -1;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- MODAL REGISTRO PREVIO -->
+    <div id="register-modal" class="modal-overlay">
+        <div class="modal-card">
+            <h2>Evaluación Interactiva</h2>
+            <p>Configuración y Soporte a Redes - CTP Santa Bárbara</p>
+            <form id="register-form" onsubmit="startAssessment(event)">
+                <div class="input-group">
+                    <label for="student-id">Número de Cédula:</label>
+                    <input type="text" id="student-id" required placeholder="Ej: 102340567">
+                </div>
+                <div class="input-group">
+                    <label for="student-name">Nombre Completo:</label>
+                    <input type="text" id="student-name" required placeholder="Ej: Juan Pérez González">
+                </div>
+                <button type="submit" class="btn-start">Iniciar Evaluación ➔</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL RESULTADOS -->
+    <div id="results-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-card">
+            <h2>Resultados de la Evaluación</h2>
+            <p id="res-student-info" style="font-weight: 600; color: #1E293B;"></p>
+            <div style="margin: 20px 0; background: #F1F5F9; padding: 16px; border-radius: 12px;">
+                <div style="font-size: 2rem; font-weight: 800; color: #2563EB;" id="res-score">0/12</div>
+                <div style="font-size: 1.1rem; font-weight: 700; color: #475569;" id="res-percentage">0%</div>
+                <div style="font-size: 0.85rem; color: #64748B; margin-top: 6px;" id="res-time">Tiempo: 00:00</div>
+            </div>
+            <button onclick="closeResultsModal()" class="btn-start" style="background-color: #64748B;">Revisar Respuestas</button>
+        </div>
+    </div>
+
+    <!-- HEADER -->
+    <header>
+        <div class="header-title">
+            <h1>Configuración y Soporte a Redes</h1>
+            <span>CTP Santa Bárbara - 11° Año</span>
+        </div>
+        <div class="header-badges">
+            <div class="badge badge-phase" id="phase-badge">Parte 1 de 2</div>
+            <div class="badge badge-timer" id="timer-badge">⏱️ 05:00</div>
+            <div class="badge badge-progress" id="progress-badge">Progreso: 0/12</div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main>
+        <div class="questions-container" id="questions-container"></div>
+
+        <div class="sidebar-container">
+            <div class="bank-card">
+                <div class="bank-title" id="bank-title">BANCO DE RESPUESTAS - PARTE 1</div>
+                <div class="options-list" id="options-list"></div>
+            </div>
+        </div>
+
+        <div class="nav-controls">
+            <button class="btn-nav btn-secondary" id="btn-prev" onclick="changePart(1)" style="visibility: hidden;">⬅ Anterior</button>
+            <button class="btn-nav btn-primary" id="btn-next" onclick="handleNextClick()">Siguiente Parte (2/2) ➔</button>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <button class="footer-btn" onclick="togglePause()"><span id="pause-icon">⏸️</span> <span id="pause-text">Pausar</span></button>
+        <button class="footer-btn" onclick="toggleSound()"><span id="sound-icon">🔊</span> Sonido: ON</button>
+        <button class="footer-btn" onclick="toggleFullScreen()">🖥️ Pantalla Completa</button>
+    </footer>
+
+    <script>
+        // PEGA AQUÍ LA URL DESPLEGADA DE TU GOOGLE APPS SCRIPT
+        const SCRIPT_URL = "https://script.google.com/macros/s/TU_ID_DE_DESPLIEGUE_AQUI/exec";
+        
+        const dataset = [
+            { id: 1, part: 1, beforeText: "El protocolo propietario de Cisco que opera en la Capa 2 para el descubrimiento de dispositivos es ", afterText: ".", correct: "CDP", explanation: "CDP es un protocolo de Capa 2 exclusivo de Cisco para descubrir vecinos." },
+            { id: 2, part: 1, beforeText: "El intervalo predeterminado para el envío de anuncios en CDP es de ", afterText: " segundos.", correct: "60", explanation: "Por defecto, CDP transmite anuncios multicast cada 60 segundos." },
+            { id: 3, part: 1, beforeText: "El estándar abierto e independiente de fabricantes para descubrimiento en Capa 2 es ", afterText: ".", correct: "LLDP", explanation: "LLDP es el estándar multivendor definido por el IEEE." },
+            { id: 4, part: 1, beforeText: "LLDP está normalizado formalmente bajo el estándar IEEE ", afterText: ".", correct: "802.1AB", explanation: "Especificación definida dentro del estándar 802.1AB." },
+            { id: 5, part: 1, beforeText: "Para habilitar la transmisión de tramas LLDP en una interfaz específica se usa el comando ", afterText: ".", correct: "lldp transmit", explanation: "El comando 'lldp transmit' activa la salida en esa interfaz." },
+            { id: 6, part: 1, beforeText: "El protocolo de sincronización horaria NTP utiliza el puerto de transporte UDP ", afterText: ".", correct: "123", explanation: "NTP opera sobre el puerto UDP 123." },
+            { id: 7, part: 2, beforeText: "Los relojes de máxima precisión como GPS o relojes atómicos se clasifican en el nivel ", afterText: ".", correct: "Stratum 0", explanation: "Stratum 0 representa las fuentes de tiempo físicas primarias." },
+            { id: 8, part: 2, beforeText: "El estado de un dispositivo totalmente no sincronizado con la jerarquía NTP se identifica como ", afterText: ".", correct: "Stratum 16", explanation: "Stratum 16 indica que el reloj está fuera de línea o sin sincronización." },
+            { id: 9, part: 2, beforeText: "La base de datos jerárquica que almacena las variables dentro de un agente SNMP se denomina ", afterText: ".", correct: "MIB", explanation: "La MIB guarda las métricas estructuradas del dispositivo." },
+            { id: 10, part: 2, beforeText: "Las alertas espontáneas enviadas sin solicitud previa por el agente SNMP hacia la NMS son llamadas ", afterText: ".", correct: "SNMP Trap", explanation: "Un Trap se envía inmediatamente al ocurrir un evento crítico." },
+            { id: 11, part: 2, beforeText: "El servicio centralizado de notificación de eventos Syslog utiliza el puerto de red UDP ", afterText: ".", correct: "514", explanation: "Syslog transmite eventos en el puerto UDP 514." },
+            { id: 12, part: 2, beforeText: "En la escala de severidad Syslog del 0 al 7, el nivel numérico que representa una advertencia es el ", afterText: ".", correct: "4", explanation: "El nivel 4 de Syslog corresponde a advertencias (Warnings)." }
+        ];
+
+        let currentPart = 1;
+        let userAnswers = {};
+        let studentData = { id: "", name: "" };
+        let timerInterval = null;
+        let timeRemaining = 300;
+        let isPaused = false;
+        let soundEnabled = true;
+        let selectedOptionText = null;
+        let isSubmitted = false;
+
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playSound(type) {
+            if (!soundEnabled) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            const now = audioCtx.currentTime;
+
+            if (type === 'select') {
+                osc.frequency.setValueAtTime(440, now);
+                osc.frequency.exponentialRampToValueAtTime(880, now + 0.1);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.1);
+                osc.start(now); osc.stop(now + 0.1);
+            } else if (type === 'drop') {
+                osc.frequency.setValueAtTime(600, now);
+                osc.frequency.exponentialRampToValueAtTime(300, now + 0.15);
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.15);
+                osc.start(now); osc.stop(now + 0.15);
+            } else if (type === 'remove') {
+                osc.frequency.setValueAtTime(300, now);
+                osc.frequency.exponentialRampToValueAtTime(150, now + 0.1);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.1);
+                osc.start(now); osc.stop(now + 0.1);
+            } else if (type === 'finish') {
+                osc.frequency.setValueAtTime(523.25, now);
+                osc.frequency.setValueAtTime(659.25, now + 0.1);
+                osc.frequency.setValueAtTime(783.99, now + 0.2);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.4);
+                osc.start(now); osc.stop(now + 0.4);
+            }
+        }
+
+        function startAssessment(e) {
+            e.preventDefault();
+            const idInput = document.getElementById('student-id').value.trim();
+            const nameInput = document.getElementById('student-name').value.trim();
+            if (!idInput || !nameInput) return;
+
+            studentData.id = idInput;
+            studentData.name = nameInput;
+
+            document.getElementById('register-modal').style.display = 'none';
+            initTimer();
+            renderCurrentPart();
+        }
+
+        function initTimer() {
+            timerInterval = setInterval(() => {
+                if (!isPaused && !isSubmitted) {
+                    timeRemaining--;
+                    updateTimerDisplay();
+                    if (timeRemaining <= 0) {
+                        clearInterval(timerInterval);
+                        submitAssessment();
+                    }
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const min = Math.floor(timeRemaining / 60).toString().padStart(2, '0');
+            const sec = (timeRemaining % 60).toString().padStart(2, '0');
+            document.getElementById('timer-badge').innerText = `⏱️ ${min}:${sec}`;
+        }
+
+        function updateProgress() {
+            const answeredCount = Object.keys(userAnswers).length;
+            document.getElementById('progress-badge').innerText = `Progreso: ${answeredCount}/12`;
+        }
+
+        function renderCurrentPart() {
+            const qContainer = document.getElementById('questions-container');
+            const oContainer = document.getElementById('options-list');
+            qContainer.innerHTML = '';
+            oContainer.innerHTML = '';
+
+            document.getElementById('phase-badge').innerText = `Parte ${currentPart} de 2`;
+            document.getElementById('bank-title').innerText = `BANCO DE RESPUESTAS - PARTE ${currentPart}`;
+
+            const filteredQuestions = dataset.filter(q => q.part === currentPart);
+
+            filteredQuestions.forEach(q => {
+                const card = document.createElement('div');
+                card.className = 'question-card';
+                card.id = `question-card-${q.id}`;
+
+                const currentValue = userAnswers[q.id] || '';
+                const filledClass = currentValue ? 'filled' : '';
+                
+                let btnColorClass = '';
+                if (currentValue) {
+                    const optIndex = filteredQuestions.findIndex(item => item.correct === currentValue);
+                    if (optIndex !== -1) btnColorClass = `color-${optIndex}`;
+                }
+
+                card.innerHTML = `
+                    <div class="question-header">
+                        <span>Ítem #${q.id}</span>
+                        <span id="status-tag-${q.id}"></span>
+                    </div>
+                    <div class="question-text">
+                        ${q.beforeText}
+                        <div class="drop-zone ${filledClass}" 
+                             id="dropzone-${q.id}" 
+                             ondrop="handleDrop(event, ${q.id})" 
+                             ondragover="handleDragOver(event)"
+                             ondragleave="handleDragLeave(event)"
+                             onclick="handleZoneClick(${q.id})">
+                            ${currentValue ? `<div class="draggable-btn ${btnColorClass}" style="cursor:pointer; width:100\%; margin:0;">${currentValue}</div>` : ''}
+                        </div>
+                        ${q.afterText}
+                    </div>
+                    <div class="feedback-box" id="feedback-${q.id}"></div>
+                `;
+                qContainer.appendChild(card);
+
+                if (isSubmitted) {
+                    applyFeedbackUI(q);
+                }
+            });
+
+            filteredQuestions.forEach((q, index) => {
+                const isUsed = Object.values(userAnswers).includes(q.correct);
+                const btn = document.createElement('div');
+                btn.className = `draggable-btn color-${index} ${isUsed ? 'used' : ''}`;
+                btn.innerText = q.correct;
+                btn.id = `option-btn-${index}`;
+
+                if (!isSubmitted && !isUsed) {
+                    btn.draggable = true;
+                    btn.ondragstart = (e) => handleDragStart(e, q.correct);
+                    btn.onclick = () => handleOptionClick(q.correct, index);
+                }
+
+                oContainer.appendChild(btn);
+            });
+
+            document.getElementById('btn-prev').style.visibility = currentPart === 2 ? 'visible' : 'hidden';
+            const btnNext = document.getElementById('btn-next');
+            if (currentPart === 1) {
+                btnNext.innerText = 'Siguiente Parte (2/2) ➔';
+                btnNext.className = 'btn-nav btn-primary';
+            } else {
+                btnNext.innerText = isSubmitted ? 'Ver Resultados 🏆' : 'Enviar respuestas ✔';
+                btnNext.className = 'btn-nav btn-primary';
+            }
+
+            updateProgress();
+        }
+
+        function handleOptionClick(text, index) {
+            if (isSubmitted) return;
+            if (selectedOptionText === text) {
+                selectedOptionText = null;
+                clearOptionSelection();
+                return;
+            }
+            selectedOptionText = text;
+            clearOptionSelection();
+            const btn = document.getElementById(`option-btn-${index}`);
+            if (btn) btn.classList.add('selected-option');
+            playSound('select');
+        }
+
+        function clearOptionSelection() {
+            document.querySelectorAll('.draggable-btn').forEach(b => b.classList.remove('selected-option'));
+        }
+
+        function handleZoneClick(questionId) {
+            if (isSubmitted) return;
+            if (selectedOptionText) {
+                userAnswers[questionId] = selectedOptionText;
+                selectedOptionText = null;
+                clearOptionSelection();
+                playSound('drop');
+                renderCurrentPart();
+            } else if (userAnswers[questionId]) {
+                delete userAnswers[questionId];
+                playSound('remove');
+                renderCurrentPart();
+            }
+        }
+
+        function handleDragStart(e, text) {
+            if (isSubmitted) return;
+            e.dataTransfer.setData('text/plain', text);
+            selectedOptionText = null;
+            clearOptionSelection();
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            if (!isSubmitted) e.currentTarget.classList.add('hovered');
+        }
+
+        function handleDragLeave(e) {
+            e.currentTarget.classList.remove('hovered');
+        }
+
+        function handleDrop(e, questionId) {
+            e.preventDefault();
+            if (isSubmitted) return;
+            e.currentTarget.classList.remove('hovered');
+            const droppedText = e.dataTransfer.getData('text/plain');
+            if (droppedText) {
+                userAnswers[questionId] = droppedText;
+                playSound('drop');
+                renderCurrentPart();
+            }
+        }
+
+        function changePart(partNumber) {
+            currentPart = partNumber;
+            selectedOptionText = null;
+            renderCurrentPart();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function handleNextClick() {
+            if (currentPart === 1) {
+                changePart(2);
+            } else {
+                if (isSubmitted) {
+                    showResultsModal();
+                } else {
+                    submitAssessment();
+                }
+            }
+        }
+
+        function submitAssessment() {
+            if (isSubmitted) return;
+            isSubmitted = true;
+            clearInterval(timerInterval);
+            playSound('finish');
+
+            renderCurrentPart();
+            showResultsModal();
+            sendToGoogleSheets();
+        }
+
+        function applyFeedbackUI(question) {
+            const userAns = userAnswers[question.id];
+            const isCorrect = userAns === question.correct;
+            const statusTag = document.getElementById(`status-tag-${question.id}`);
+            const feedbackBox = document.getElementById(`feedback-${question.id}`);
+
+            if (isCorrect) {
+                statusTag.innerHTML = `<span style="color:#16A34A;">✅ ¡Correcto!</span>`;
+                feedbackBox.className = 'feedback-box correct';
+                feedbackBox.innerHTML = `<strong>¡Excelente!</strong> ${question.explanation}`;
+            } else {
+                statusTag.innerHTML = `<span style="color:#DC2626;">❌ Incorrecto</span>`;
+                feedbackBox.className = 'feedback-box incorrect';
+                feedbackBox.innerHTML = `<strong>Respuesta correcta: ${question.correct}.</strong> ${question.explanation}`;
+            }
+        }
+
+        function calculateScore() {
+            let score = 0;
+            dataset.forEach(q => {
+                if (userAnswers[q.id] === q.correct) score++;
+            });
+            return score;
+        }
+
+        function showResultsModal() {
+            const score = calculateScore();
+            const percentage = Math.round((score / 12) * 100);
+            const timeUsedSec = 300 - timeRemaining;
+            const min = Math.floor(timeUsedSec / 60).toString().padStart(2, '0');
+            const sec = (timeUsedSec % 60).toString().padStart(2, '0');
+
+            document.getElementById('res-student-info').innerText = `${studentData.name} (${studentData.id})`;
+            document.getElementById('res-score').innerText = `${score} / 12 PTS`;
+            document.getElementById('res-percentage').innerText = `${percentage}% de Acierto`;
+            document.getElementById('res-time').innerText = `Tiempo utilizado: ${min}:${sec}`;
+
+            document.getElementById('results-modal').style.display = 'flex';
+        }
+
+        function closeResultsModal() {
+            document.getElementById('results-modal').style.display = 'none';
+        }
+
+        // FUNCIÓN DE ENVÍO CORREGIDA (CORS & PARAMS)
+        function sendToGoogleSheets() {
+            if (!SCRIPT_URL || SCRIPT_URL.includes("TU_ID_DE_DESPLIEGUE_AQUI")) {
+                console.warn("SCRIPT_URL no configurada correctamente.");
+                return;
+            }
+
+            const score = calculateScore();
+            const percentage = Math.round((score / 12) * 100);
+            const timeUsedSec = 300 - timeRemaining;
+
+            const payload = {
+                cedula: studentData.id,
+                nombre: studentData.name,
+                puntaje: score,
+                porcentaje: percentage,
+                tiempoSegundos: timeUsedSec,
+                respuestas: JSON.stringify(userAnswers)
+            };
+
+            const formData = new URLSearchParams();
+            for (const key in payload) {
+                formData.append(key, payload[key]);
+            }
+
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: formData.toString(),
+                keepalive: true
+            })
+            .then(() => console.log("Datos enviados correctamente."))
+            .catch(err => console.error("Error al enviar los datos:", err));
+        }
+
+        function togglePause() {
+            if (isSubmitted) return;
+            isPaused = !isPaused;
+            document.getElementById('pause-icon').innerText = isPaused ? '▶️' : '⏸️';
+            document.getElementById('pause-text').innerText = isPaused ? 'Reanudar' : 'Pausar';
+            const qContainer = document.getElementById('questions-container');
+            qContainer.style.opacity = isPaused ? '0.2' : '1';
+            qContainer.style.pointerEvents = isPaused ? 'none' : 'auto';
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            document.getElementById('sound-icon').innerText = soundEnabled ? '🔊' : '🔇';
+        }
+
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => console.log(err));
+            } else if (document.exitFullscreen) {
+                document.exitFullscreen();
+            }
+        }
+    </script>
+</body>
+</html>
